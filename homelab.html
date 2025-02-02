@@ -61,11 +61,7 @@
 
 <h2 id="architecture">Architecture</h2>
 <hr>
-<<<<<<< HEAD
-<p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent possibility of inter-domain ARP requests and broadcasts and forcing all inter-domain communications to come through the firewall instead, having centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using client identities from the Active Directory domain, a certificate authority and encryption at rest and in transit at all points of the network flow. The network features a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. The inter-domain and VPN traffic is routed through pfSense firewall with tight ACL ruleset.</p>
-=======
 <p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent inter-domain ARP and broadcast spoofing and forcing all inter-domain communications to come through the firewall instead, having centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using client identities from the Active Directory domain, a certificate authority and encryption at rest and in transit at all points of the network flow. The network features a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. The inter-domain and VPN traffic is routed through pfSense firewall with tight ACL ruleset.</p>
->>>>>>> c53509a (changes)
 
 <p><img src="/assets/topology.png" alt="architecture"></p>
 
