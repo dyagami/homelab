@@ -44,7 +44,8 @@ body {
   font-family: "Source Code Pro", monospace;
   font-size: 16.5px;
   color: var(--text-color);
-  text-align: left;
+  text-align: justify;
+  text-justify: inter-character;
   line-height: 1.5 !important;
 }
 
