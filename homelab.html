@@ -69,7 +69,7 @@
 <ul>
   <li>VLAN 10 (CRITICAL) - ELK Stack Kibana interface and collectors, backup network shares</li>
   <li>VLAN 20 (SERVERS) - Client-facing and server dependency services - Bind DNS server, FreeRADIUS server, AD-joined SMB network shares for clients, AD Domain, Windows 11 Workstation and Server 2022 Domain Controller RDP, Proxmox VE management interface, Proxmox Backup Server management interface, SearXNG search server</li>
-  <li>VLAN 30 (AUTHORIZED) - Authorized clients connecting to the network that should be allowed access to client-facing services (these are configured via firewall ACLs and access to service like SSH, access to Critical subnet, etc. are assigned on a per-IP basis), OpenWRT Wireless Access Point with WPA3 802.1X PEAP authentication to provide authorized users with wireless access to the network, Local LLM hosted outside the server rack on my host</li>
+  <li>VLAN 30 (AUTHORIZED) - Authorized clients connecting to the network that should be allowed access to client-facing services (these are configured via firewall ACLs and access to services like SSH and RDP, access to the Critical subnet, etc. are assigned on a per-IP basis), OpenWRT Wireless Access Point with WPA3 802.1X PEAP authentication to provide authorized users with wireless access to the network, Local LLM hosted outside the server rack on my host</li>
   <li>VLAN 40 (UNAUTHORIZED) - Unauthorized endpoints (ex. IoT devices, guests at home) - currently unused, as the ISP subnet is used for that purpose, from which packets are dropped by default on the perimeter firewall</li>
   <li>OpenVPN - This subnet is routed as needed, with each client having a forced IP address and being provided with routing to only the required services</li>
 </ul>
@@ -78,7 +78,7 @@
 
 <h3 id="management">Management</h3>
 <hr>
-<p>I prefer to use SSH and RDP for most tasks, but for physical host reboots (all drives are LUKS-encrypted), firmware changes and network connectivity troubleshooting I have a 4-host KVM with a keyboard and a mouse on an extendable shelf and a small display at hand with all cabling coupled in a tunnel next to the rack. The rack has air cooling connected to a 12V thermostat.</p>
+<p>I prefer to use SSH and RDP for most tasks, but for physical host reboots (all drives are LUKS-encrypted), firmware changes and network connectivity troubleshooting I have a 4-host KVM with keyboard and mouse on an extendable shelf and a small display at hand with all cabling coupled in a tunnel next to the rack. The rack has air cooling connected to a 12V thermostat.</p>
 
 <p><img src="/assets/resized/homelab_2-2560x1280.jpg" alt="" srcset="    /assets/resized/homelab_2-800x400.jpg 800w,    /assets/resized/homelab_2-1200x600.jpg 1200w,    /assets/resized/homelab_2-1920x960.jpg 1920w,    /assets/resized/homelab_2-2560x1280.jpg 2560w, /assets/homelab_2.jpg 7339w"></p>
 
