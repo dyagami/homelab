@@ -15,15 +15,15 @@
 <meta property="og:locale" content="en_US">
 <meta name="description" content="Intro">
 <meta property="og:description" content="Intro">
-<link rel="canonical" href="http://localhost:4000/homelab">
-<meta property="og:url" content="http://localhost:4000/homelab">
+<link rel="canonical" href="http://0.0.0.0:4000/homelab">
+<meta property="og:url" content="http://0.0.0.0:4000/homelab">
 <meta property="og:site_name" content="Dominik Jackowski">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2025-02-01T00:00:00+01:00">
 <meta name="twitter:card" content="summary">
 <meta property="twitter:title" content="Homelab Project">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-02-01T00:00:00+01:00","datePublished":"2025-02-01T00:00:00+01:00","description":"Intro","headline":"Homelab Project","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/homelab"},"url":"http://localhost:4000/homelab"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-02-01T00:00:00+01:00","datePublished":"2025-02-01T00:00:00+01:00","description":"Intro","headline":"Homelab Project","mainEntityOfPage":{"@type":"WebPage","@id":"http://0.0.0.0:4000/homelab"},"url":"http://0.0.0.0:4000/homelab"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css">
 </head>
@@ -61,7 +61,7 @@
 
 <h2 id="architecture">Architecture</h2>
 <hr>
-<p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent inter-domain ARP and broadcast spoofing and forcing all inter-domain communications to come through the firewall instead, having centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using client identities from the Active Directory domain, a certificate authority and encryption at rest and in transit at all points of the network flow. The network features a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. The inter-domain and VPN traffic is routed through pfSense firewall with tight ACL ruleset.</p>
+<p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent inter-domain ARP spoofing, forcing all inter-domain communications to come through the firewall instead. The network features centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using client identities from the Active Directory domain, with the Domain Controller being hardened per CIS guidelines. The network has two Certificate Authorities - one air-gapped and being the root CA for local domain and an intermediate CA on the Domain Controller to issue certificates to Windows hosts and secure RDP connections. All data is encrypted at rest and in transit at all points of the network flow. The network features a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. All hosts on the network have appropriate audit information collected and shipped to Elasticsearch for enrichment and logging purposes. The inter-domain and VPN traffic is routed through pfSense firewall with a tight least-privilege ACL ruleset.</p>
 
 <p><img src="/assets/topology.png" alt="architecture"></p>
 
