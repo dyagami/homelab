@@ -15,15 +15,15 @@
 <meta property="og:locale" content="en_US">
 <meta name="description" content="Intro">
 <meta property="og:description" content="Intro">
-<link rel="canonical" href="https://dyagami.tech/homelab">
-<meta property="og:url" content="https://dyagami.tech/homelab">
+<link rel="canonical" href="http://localhost:4000/homelab">
+<meta property="og:url" content="http://localhost:4000/homelab">
 <meta property="og:site_name" content="Dominik Jackowski">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2025-02-01T00:00:00+01:00">
 <meta name="twitter:card" content="summary">
 <meta property="twitter:title" content="Homelab Project">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-02-01T00:00:00+01:00","datePublished":"2025-02-01T00:00:00+01:00","description":"Intro","headline":"Homelab Project","mainEntityOfPage":{"@type":"WebPage","@id":"https://dyagami.tech/homelab"},"url":"https://dyagami.tech/homelab"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-02-01T00:00:00+01:00","datePublished":"2025-02-01T00:00:00+01:00","description":"Intro","headline":"Homelab Project","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/homelab"},"url":"http://localhost:4000/homelab"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" type="text/css" href="/assets/main-dark.css">
 </head>
@@ -57,33 +57,39 @@
 
 <p>This is my homelab side project that I’ve been working on for the past 2 years. It went through being just an old laptop with a virtualized network to a small server rack that has been helping me put my skills into practice in a small, scalable environment.</p>
 
-<p><img src="/assets/resized/homelab_1-2560x1182.jpg" alt="" srcset="    /assets/resized/homelab_1-800x369.jpg 800w,    /assets/resized/homelab_1-1200x554.jpg 1200w,    /assets/resized/homelab_1-1920x887.jpg 1920w,    /assets/resized/homelab_1-2560x1182.jpg 2560w, /assets/homelab_1.jpg 8160w"></p>
+<p><img src="/assets/resized/homelab_1-2560x1440.jpg" alt="" srcset="    /assets/resized/homelab_1-800x450.jpg 800w,    /assets/resized/homelab_1-1200x675.jpg 1200w,    /assets/resized/homelab_1-1920x1080.jpg 1920w,    /assets/resized/homelab_1-2560x1440.jpg 2560w, /assets/homelab_1.jpg 4032w"></p>
 
 <h2 id="architecture">Architecture</h2>
 
 <hr>
-<p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent inter-domain ARP spoofing, forcing all inter-domain communications to come through the firewall instead. The network features centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using client identities from the Active Directory domain, with the Domain Controller being hardened per CIS guidelines. The network has two Certificate Authorities - one air-gapped and being the root CA for local domain and an intermediate CA on the Domain Controller to issue certificates to Windows hosts and secure RDP connections. All data is encrypted at rest and in transit at all points of the network flow. The network features a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. All hosts on the network have appropriate audit information collected and shipped to Elasticsearch for enrichment and logging purposes. The inter-domain and VPN traffic is routed through pfSense firewall with a tight least-privilege ACL ruleset. Whenever possible, I’ve avoided using Docker for architecture and software stack deployments and opted for manual configuration instead so that I could learn more.</p>
+<p>I put emphasis on secure-by-design architecture, making the network segmented through VLANs to prevent inter-domain ARP spoofing, forcing all inter-domain communications to come through the firewall instead. The network features centralized authentication at multiple points, including 802.1X RADIUS authentication for wireless and VPN clients using Active Directory Domain Controller as an Identity Provider, hardened per CIS guidelines. The network has two Certificate Authorities - one air-gapped and being the root CA for local domain and an intermediate CA on the Domain Controller to issue certificates to Windows hosts and secure RDP connections. All data is encrypted at rest and in transit at all points of the network flow.</p>
+
+<p>At one point, the network featured a micro-scale SOC built on top of ELK Stack with Suricata NIDS and Packetbeat analyzing all intra- and inter-domain traffic through a network tap on the downstream switch for full network visibility and logging of all packets for further analysis and threat hunting activities. All hosts on the network had appropriate audit information collected and shipped to Elasticsearch for enrichment and logging purposes. This was done so I could practice ELK Stack deployment and connecting the endpoints as well as configuring them for proper telemetry logging. I have removed this deployment since and am meaning to convert the physical host that had the ELK Stack deployed to a Tor node.</p>
+
+<p>The inter-domain and VPN traffic is routed through pfSense firewall with a tight least-privilege ACL ruleset. Whenever possible, I’ve avoided using Docker for architecture and software stack deployments and opted for manual configuration instead so that I could learn more.</p>
 
 <p><img src="/assets/resized/homelab_topology-1200x770.png" alt="" srcset="    /assets/resized/homelab_topology-800x513.png 800w,    /assets/resized/homelab_topology-1200x770.png 1200w, /assets/homelab_topology.png 1820w"></p>
 
 <p>The network is segmented into the following VLANs:</p>
 
 <ul>
-  <li>VLAN 10 (CRITICAL) - ELK Stack Kibana interface and collectors, backup network shares</li>
-  <li>VLAN 20 (SERVERS) - Client-facing and server dependency services - Bind DNS server, FreeRADIUS server, AD-joined SMB network shares for clients, AD Domain, Windows 11 Workstation and Server 2022 Domain Controller RDP servers, Proxmox VE management interface, Proxmox Backup Server management interface, SearXNG search server</li>
-  <li>VLAN 30 (AUTHORIZED) - Authorized clients connecting to the network that should be allowed access to client-facing services (these are configured via firewall ACLs and access to services like SSH and RDP, access to the Critical subnet, etc. are assigned on a per-IP basis), OpenWRT Wireless Access Point with WPA3 802.1X PEAP authentication to provide authorized users with wireless access to the network, Local LLM hosted outside the server rack on my host</li>
-  <li>VLAN 40 (UNAUTHORIZED) - Unauthorized endpoints (ex. IoT devices, guests at home) - currently unused, as the ISP subnet is used for that purpose, from which packets are dropped by default on the perimeter firewall</li>
-  <li>OpenVPN - This subnet is routed as needed, with each client having a forced IP address and being provided with routing to only the required services. Traffic Shaping is incorporated to prioritize packet scheduling of those connections to provide more semless RDP/SSH experience and better network share performance for the clients. Since the server utilises tls-crypt-v2 for instances of clients connecting from a DPI-powered public Access Points, this becomes especially important due to double-encapsulation/double-encryption and the connections being TCP. Client-specific overrides are highly utilised to pin each client certificate’s IP address for the ACLs to work as intended.</li>
+  <li>VLAN 10 (CRITICAL) - formerly ELK Stack Kibana interface and collectors, now backup network shares, Cisco SSH interfaces</li>
+  <li>VLAN 20 (SERVERS) - Client-facing and server dependency services - Bind DNS server, FreeRADIUS server, AD-joined SMB network shares for clients, AD Domain, Windows 11 Workstation and Server 2022 Domain Controller RDP servers, Proxmox VE management interface, Proxmox Backup Server management interface, SearXNG search server, OpenProject deployment</li>
+  <li>VLAN 30 (AUTHORIZED) - Authorized clients connecting to the network that should be allowed access to client-facing services (these are configured via firewall ACLs and access to services like SSH and RDP, access to the Critical subnet, etc. are assigned on a per-IP basis), Cisco Wireless Access Point with 802.1X PEAP authentication to provide authorized users with wireless access to the network, Local LLM hosted outside the server rack on my host</li>
+  <li>VLAN 40 (UNAUTHORIZED) - Unauthorized endpoints (ex. IoT devices, guests at home) - currently unused, as the ISP subnet is used for that purpose, with only egress traffic allowed</li>
+  <li>OpenVPN - This subnet is routed as needed, with each client having a forced IP address and being provided with routing to only the required services. Traffic Shaping is incorporated to prioritize packet scheduling of those connections to provide more semless RDP/SSH experience and better network share performance for the clients. Since the server utilises tls-crypt-v2 for instances of clients connecting from a DPI-powered public Access Points, this becomes especially important due to double-encapsulation/double-encryption and the connections being TCP. The whole network was optimized with the highest non-fragmentable MTU. Client-specific overrides are highly utilised to pin each client certificate’s IP address for the ACLs to work as intended.</li>
 </ul>
 
-<p><img src="/assets/resized/homelab_3-2560x1182.jpg" alt="" srcset="    /assets/resized/homelab_3-800x369.jpg 800w,    /assets/resized/homelab_3-1200x554.jpg 1200w,    /assets/resized/homelab_3-1920x887.jpg 1920w,    /assets/resized/homelab_3-2560x1182.jpg 2560w, /assets/homelab_3.jpg 8160w"></p>
+<p><img src="/assets/resized/homelab_2-2560x1440.jpg" alt="" srcset="    /assets/resized/homelab_2-800x450.jpg 800w,    /assets/resized/homelab_2-1200x675.jpg 1200w,    /assets/resized/homelab_2-1920x1080.jpg 1920w,    /assets/resized/homelab_2-2560x1440.jpg 2560w, /assets/homelab_2.jpg 4032w"></p>
 
 <h3 id="management">Management</h3>
 
 <hr>
-<p>I prefer to use SSH and RDP for most tasks, but for physical host reboots (all drives are LUKS-encrypted), firmware changes and network connectivity troubleshooting I have a 4-host KVM with keyboard and mouse on an extendable shelf and a small display at hand with all cabling coupled in a tunnel next to the rack. The rack has air cooling connected to a 12V thermostat.</p>
+<p>I prefer to use SSH and RDP for most tasks, but for physical host reboots (all drives are LUKS-encrypted), firmware changes and network connectivity troubleshooting I have a 4-host KVM with keyboard and mouse on an extendable shelf and a small display at hand with all cabling coupled in a tunnel next to the rack. The rack has air cooling connected to a 12V thermostat. The Cisco switches utilised are 2960-X 48-port PoE+ models with 10G SFP ports and had horrendously loud cooling, so I replaced it with small quiet Noctua fans i wired myself that are placed in 3D-printed cases.</p>
 
-<p><img src="/assets/resized/homelab_2-2560x1280.jpg" alt="" srcset="    /assets/resized/homelab_2-800x400.jpg 800w,    /assets/resized/homelab_2-1200x600.jpg 1200w,    /assets/resized/homelab_2-1920x960.jpg 1920w,    /assets/resized/homelab_2-2560x1280.jpg 2560w, /assets/homelab_2.jpg 7339w"></p>
+<p><img src="/assets/resized/homelab_4-2560x1440.jpg" alt="" srcset="    /assets/resized/homelab_4-800x450.jpg 800w,    /assets/resized/homelab_4-1200x675.jpg 1200w,    /assets/resized/homelab_4-1920x1080.jpg 1920w,    /assets/resized/homelab_4-2560x1440.jpg 2560w, /assets/homelab_4.jpg 4032w"></p>
+
+<p><img src="/assets/resized/homelab_3-2560x1440.jpg" alt="" srcset="    /assets/resized/homelab_3-800x450.jpg 800w,    /assets/resized/homelab_3-1200x675.jpg 1200w,    /assets/resized/homelab_3-1920x1080.jpg 1920w,    /assets/resized/homelab_3-2560x1440.jpg 2560w, /assets/homelab_3.jpg 4032w"></p>
 
 
 
